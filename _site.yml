@@ -1,0 +1,30 @@
+name: "Jimmy G. Moore"
+output_dir: "."
+navbar:
+  title: "Jimmy G. Moore"
+  left:
+    - text: "About The Data"
+      href: dataDescription.html
+    - text: "Exploratory Analysis"
+      href: exploratoryAnalysis.html
+    - text: "Predictive Model"
+      href: prediction.html
+  right:
+    - icon: fa-envelope fa-lg
+      href: contact.html
+    - icon: fa-github fa-lg
+      href: https://github.com/JGMoore44
+    - icon: fa-linkedin fa-lg
+      href: https://www.linkedin.com/in/jimmy-g-moore-11907490/
+output:
+  html_document:
+  theme: paper
+  css: 'styles.css
+      
+      
+      
+      
+      
+      
+      
+      
