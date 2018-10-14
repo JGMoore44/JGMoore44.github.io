@@ -1,0 +1,7 @@
+slides > slide.backdrop {
+  background: white;
+}
+
+slides > slide { overflow: scroll; }
+slides > slide:not(.nobackground):after {content: '';}
+slides > slide:not(.nobackground):before {background: none;}
