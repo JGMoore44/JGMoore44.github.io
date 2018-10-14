@@ -2,10 +2,6 @@
 title: "Visualization, Exploratory Analysis, and Prediction Example"
 ---
 
-<link rel = "stylesheet" href="styles.css" type = "text/css">
-
-<img scr = "images/JimmyMoore_headshot.jpg" style = "width:25%; border:10px solid; margin-right: 20px" align="left">
-
 The purpose of this website is to conduct analysis on a public dataset. This site contains 3 parts
 
 1) A public dataset was chosen. A link to this dataset as well as a short description of why I chose it can be found in the "About the Data" section.

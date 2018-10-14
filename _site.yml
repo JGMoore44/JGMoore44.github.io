@@ -1,7 +1,7 @@
 name: "Jimmy G. Moore"
 output_dir: "."
 navbar:
-  title: "Jimmy G. Moore"
+  title: "Visualization, Exploratory Analysis, and Prediction Example"
   left:
     - text: "About The Data"
       href: dataDescription.html
