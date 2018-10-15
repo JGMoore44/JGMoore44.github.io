@@ -1,0 +1,80 @@
+```{r}
+setTrainTest = function(dat,option="train",foldToTest=1){
+  for(j in 1:nrow(dat)){
+    foldNum = (j-1)%%5 + 1
+    dat$fold[j] = foldNum
+  }
+  if(option == "train"){
+    trainingSet = dat[-which(dat$fold==foldToTest),]
+    trainingSet = subset(trainingSet, select = -c(fold))
+    return(trainingSet)
+  }else{
+    testSet = dat[which(dat$fold==foldToTest),]
+    testSet = subset(testSet,select = -c(fold))
+    return(testSet)
+  }
+}
+
+###
+# Function: optimumElastic
+optimumElastic = function(dat,resp){
+  library(glmnet)
+  response = c(resp)
+  dat$responseFeature = dat[,resp]
+  dat = dat[,!(names(dat)%in% response)]
+
+  alphaVect = seq(from=0.05, to=0.95, by = 0.01)
+  MSEP = numeric(length(alphaVect))
+  #Set up folds for CV
+  for(j in 1:nrow(dat)){
+    foldNum = (j-1)%%5 + 1
+    dat$fold[j] = foldNum
+  }
+  for (i in 1:length(alphaVect)) {
+    for (j in 1:5) {
+      #Training and Test Sets
+      trainingSet = dat[-which(dat$fold==j),]
+      trainingSet = subset(trainingSet, select = -c(fold))
+      testSet = dat[which(dat$fold==j),]
+      testSet = subset(testSet,select = -c(fold))
+      trainingMat = model.matrix(responseFeature ~ ., data = trainingSet)
+      testMat = model.matrix(responseFeature ~ ., data = testSet)
+      
+      #Beginin Regression
+      cvElastic = cv.glmnet(trainingMat,trainingSet$responseFeature,alpha = alphaVect[i])
+      minLambda = cvElastic$lambda.min
+      tempMod = glmnet(trainingMat,trainingSet$responseFeature,alpha = alphaVect[i],lambda = minLambda)
+      pred.elastic = predict(tempMod,testMat)
+      MSEPTemp = mean((pred.elastic-testSet$responseFeature)^2)
+      MSEP[i] = MSEP[i] + MSEPTemp
+    }
+    MSEP[i] = MSEP[i]/5
+  }
+  #record index of best Alpha
+  bestAlpha = which.min(MSEP)
+  listToReturn = list(bestAlphaIndex = bestAlpha,
+                      alphaVect=alphaVect,
+                      errorRate = MSEP)
+  return(listToReturn)
+}
+
+#Exclude Subject ID from model
+data = dataWithSubject[,!(names(dataWithSubject)%in% c("subject."))]
+
+#Determine best Model
+set.seed(1234)
+pInfoList = optimumElastic(data,"motor_UPDRS")
+plot(pInfoList$alphaVect, pInfoList$errorRate)
+
+#visualize best model
+#Divide into Training and Test
+trainingSet = setTrainTest(data,"train",1)
+testSet = setTrainTest(data,"test",1)
+trainingMat = model.matrix(motor_UPDRS ~ ., data = trainingSet)
+testMat = model.matrix(motor_UPDRS ~ ., data = testSet)
+
+cvElastic = cv.glmnet(trainingMat,trainingSet$motor_UPDRS,alpha=pInfoList$alphaVect[pInfoList$bestAlphaIndex])
+plot(cvElastic$lambda,cvElastic$cvm, type = "l", main = "Elastic Net")
+predict(cvElastic, type = "coefficients")
+
+```
