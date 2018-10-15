@@ -65,7 +65,7 @@ optimumElastic = function(dat,resp){
 ```{r}
 #Predict Motor UPDRS Score
 #Exclude Subject ID and Total Score from model
-data = dataWithSubject[,!(names(dataWithSubject)%in% c("subject.","total_UPDRS"))]
+data = dataWithSubject[,!(names(dataWithSubject)%in% c("subject.","total_UPDRS","test_time"))]
 
 #Determine best Model
 set.seed(1234)
@@ -83,11 +83,8 @@ testMat = model.matrix(motor_UPDRS ~ ., data = testSet)
 cvElastic = cv.glmnet(trainingMat,trainingSet$motor_UPDRS,alpha=pInfoList$alphaVect[pInfoList$bestAlphaIndex])
 plot(cvElastic$lambda,cvElastic$cvm, type = "l", main = "Elastic Net")
 abline(v = cvElastic$lambda.min)
-coef(cvElastic)
-predict(cvElastic, type = "coefficients")
-predict(cvElastic,testMat,s = "lambda.min")
-plot(cvElastic, type = "coefficients")
-autoplot(cvElastic)
-
-
+yHat =predict(cvElastic,testMat,s = "lambda.min")
+plot(yHat,(testSet$motor_UPDRS-yHat))
+plot(cvElastic)
+abline(v = log(cvElastic$lambda.min),col= "red", lwd=3, lty=2)
 ```
