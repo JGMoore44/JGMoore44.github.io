@@ -2,7 +2,7 @@
 title: "Prediction With Optimal Elastic Net Model"
 ---
 
-```{r,echo=FALSE}
+```{r,echo=FALSE,message=FALSE,warning=FALSE}
 ###
 # Function: setTrainTest
 setTrainTest = function(dat,option="train",foldToTest=1){
@@ -67,19 +67,19 @@ optimumElastic = function(dat,resp){
 
 ## Elastic Net Model
 
-The Machine Learning Algorithm I have chosen is an Elastic Net, regression model. The model is defined by minimizing the term $$\frac{(1-\alpha)}{2}*||\beta||_2^2+\frac{\alpha}{2}*||\beta||_1$$
+The Machine Learning Algorithm I have chosen is an Elastic Net Regression model. The model is defined by minimizing the term $$\frac{(1-\alpha)}{2}*||\beta||_2^2+\frac{\alpha}{2}*||\beta||_1$$
 
 when, $$||\beta||_2 = \sqrt{\lambda\sum_{j=1}^p\beta_j^2}$$
 
 and, $$||\beta||_1 = \lambda\sum_{j=1}^p |\beta_j|$$
 
-In this case $\alpha$ determines the amount of weight given to LASSO and Ridge shrinkage penalties, and $\lambda$ is the tuning parameter which determines the amount of contraint placed on the coefficients of our model.  I have chosen this model because it highlights a few important concepts in machine learning:
+In this case $\alpha$ determines the amount of weight given to LASSO and Ridge shrinkage penalties, and $\lambda$ is the tuning parameter which determines the amount of constraint placed on the coefficients of our model.  I have chosen this model because it highlights a few important concepts in machine learning:
 
-1) **Cross Validation:** This model uses 5-fold cross-validation on the dataset to pick the best (balanced error rate and generalizability) model.
+1) **Cross Validation:** This model uses 5-fold cross-validation on the dataset to pick the best (balance between error rate and generalizability) model.
 
-2) **Parameter Tuning** This model executes an iterative process to tune the parameters $\alpha$ and $\lambda$ in a way that minimizes the mean squared error(MSE).
+2) **Parameter Tuning** This model executes an iterative process to tune the parameters $\alpha$ and $\lambda$ in a way that minimizes the mean squared error (MSE).
 
-3) **Simplicity** Regression modelsn (especially when they use shrinkage methods such as Elastic Net) are very attractive in their simplicity and interpretability. Although nonparametric models such as GAMS, Random Forrest, and ANN's can be more effective when the data is messy, regression models are hard to beat when the data is linear. In this case our Elastic Net model is good for both predicting, and inference. By analyzing the coefficients' we can get an idea for how certain features affect the outcome metric. In practice, understanding these effects can lead to actionable measures for performance improvement.
+3) **Simplicity** Regression models (especially when they use shrinkage methods such as Elastic Net) are very attractive in their simplicity and interpretability. Although nonparametric models such as GAMS, Random Forrest, and ANN's can be more effective, regression models are hard to beat in their simplicity and efficacy when the data is linear. In this case our Elastic Net model is good for both predicting, and inference. By analyzing the coefficients' we can get an idea for how certain features affect the outcome metric. In practice, understanding these effects can lead to actionable measures for performance improvement.
 
 ##Model Buidling
 ###Data Set up
@@ -92,10 +92,11 @@ data = dataWithSubject[,!(names(dataWithSubject)%in% c("subject.","total_UPDRS",
 ```
 
 ### Run Model
-Now we will run our data through our ML Algorithm `optimumElastic()` which takes our data as well as the desired response variable in as arguments, uses cross validation to determine the optimal tunes of $\lambda$ as it correspond to its respecitve $\alpha$ value (over a sequence from $\alpha = (0.5,0.95)$), and returns a list of error rates as they relate to each $\alpha$ value as well as the $\alpha$ value that yields the lowest error rate. The source code for function `optimumElastic()` can be found in Appendix 1 in the **Source Code** tab at the top of this web page
-```{r}
-#Determine best Model
+Now we will run our data through our ML Algorithm `optimumElastic()` which takes our data and the desired response variable in as arguments, uses cross validation to determine the optimal tunes of $\lambda$ as it correspond to its respecitve $\alpha$ value (over a sequence from $\alpha = (0.5,0.95)$), and returns a list of error rates as they relate to each $\alpha$ value as well as the $\alpha$ value that yields the lowest error rate. The source code for function `optimumElastic()` can be found in Appendix 1 in the **Source Code** tab at the top of this web page.
+
+```{r,message=FALSE,warning=FALSE}
 library(glmnet)
+#Determine best Model
 set.seed(1234)
 pInfoList = optimumElastic(data,"motor_UPDRS")
 ```
@@ -107,7 +108,7 @@ plot(pInfoList$alphaVect, pInfoList$errorRate,col=ifelse(pInfoList$alphaVect==pI
 
 We can see that the lowest error rate is indicated by the red point in the above plot and corresponds to the best elastic net model for our data. In this case $\alpha = 0.6$
 
-We will now visualize how the optimal $\lambda$ was chosen for this model.
+Next, we will visualize how the optimal $\lambda$ was chosen for this model.
 ```{r, echo = FALSE}
 #visualize best model
 #Divide into Training and Test
@@ -123,6 +124,7 @@ abline(v = cvElastic$lambda.min,col = "blue",lwd=1)
 abline(h = min(cvElastic$cvm),col = "blue", lwd=1)
 abline(v = cvElastic$lambda.1se,col = "blue",lwd=1, lty=2)
 ```
+
 The above plot visualizes how our mean cross validated error rate (MCVE) changes as $\lambda$ increases. The solid blue line corresponds to the $\lambda$ value that yields the minimum MCVE, and the dashed line corresponds to the value the is 1 standard error from this minimum value. Generally, anything in this range is a valid selection, however for our prediction model we are interested in the minimum.
 
 ```{r,echo = FALSE}
@@ -139,7 +141,7 @@ Now we are going to use our model to predict `motor_UPDRS`. We will also look at
 yHat =predict(cvElastic,testMat,s = "lambda.min")
 ```
 
-```{r, echo=FALSE}
+```{r, echo=FALSE,message=FALSE,warning=FALSE}
 ##Residual Analysis
 diagFrame = data.frame(predVal = c(yHat),
                        realVal = c(testSet$motor_UPDRS),
@@ -164,10 +166,10 @@ ggplot(data = diagFrame, aes(sample = resi))+
   ylab("Standardized Residuals")
 ```
 
-We can see in the above Q-Q plot that there may be slight deviations from normality, however, the assumption of normality is relatively flexible, especially in the context of prediction adn therefore we can conclude that our model is valid for prdictions.
+We can see in the above Q-Q plot that there may be slight deviations from normality, however, the assumption of normality is relatively flexible, especially in the context of prediction and therefore we can conclude that our model is valid for predictions.
 
 ###Final Model
-We will now look at the coefficient values generated for our final model. Notice that we were able to obtain an MSE of about 57.2 while using fewer predictors than that of a full model (simplicity). The chosen features and their corresponding coefficient estimates are seen in the table below
+We will now look at the coefficient values generated for our final model. Notice that we were able to obtain an MSE of about 57.2 while using fewer predictors than that of a full model. This is one of the benefits of shrinkage models. The chosen features and their corresponding coefficient estimates are seen in the table below
 ```{r, echo=FALSE}
 set.seed(1234)
 mean((yHat-testSet$motor_UPDRS)^2)
@@ -177,7 +179,7 @@ predict(cvElastic,testMat,type = "coefficients")
 ###Comparision to a Random Forest
 Arguably, Random Forests are the gold standard for quick and dirt prediction models. We will now generate a random forest model with 100 trees and compare the MSE of prediction to that of our elastic net model.
 
-```{r, echo = FALSE}
+```{r, echo = FALSE,message=FALSE,warning=FALSE}
 library(randomForest)
 set.seed(1234)
 rf = randomForest(motor_UPDRS~.,data = trainingSet, ntree = 100, importance=TRUE)
@@ -185,11 +187,13 @@ rfPred = predict(rf,testSet)
 ```
 
 ```{r}
+#Calculate MSE of our Random Forest Model
 mean((rfPred - testSet$motor_UPDRS)^2)
 ```
 Notice thate our random forest model gives us a smaller MSE prediction rate. Now we will look at how each feature influences our error rate.
 
 ```{r}
+#Visualize Variable Importance
 varImpPlot(rf, main = "Random Forest VIF Plot")
 ```
 

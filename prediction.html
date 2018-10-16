@@ -223,14 +223,14 @@ $(document).ready(function () {
 
 <div id="elastic-net-model" class="section level2">
 <h2>Elastic Net Model</h2>
-<p>The Machine Learning Algorithm I have chosen is an Elastic Net, regression model. The model is defined by minimizing the term <span class="math display">\[\frac{(1-\alpha)}{2}*||\beta||_2^2+\frac{\alpha}{2}*||\beta||_1\]</span></p>
+<p>The Machine Learning Algorithm I have chosen is an Elastic Net Regression model. The model is defined by minimizing the term <span class="math display">\[\frac{(1-\alpha)}{2}*||\beta||_2^2+\frac{\alpha}{2}*||\beta||_1\]</span></p>
 <p>when, <span class="math display">\[||\beta||_2 = \sqrt{\lambda\sum_{j=1}^p\beta_j^2}\]</span></p>
 <p>and, <span class="math display">\[||\beta||_1 = \lambda\sum_{j=1}^p |\beta_j|\]</span></p>
-<p>In this case <span class="math inline">\(\alpha\)</span> determines the amount of weight given to LASSO and Ridge shrinkage penalties, and <span class="math inline">\(\lambda\)</span> is the tuning parameter which determines the amount of contraint placed on the coefficients of our model. I have chosen this model because it highlights a few important concepts in machine learning:</p>
+<p>In this case <span class="math inline">\(\alpha\)</span> determines the amount of weight given to LASSO and Ridge shrinkage penalties, and <span class="math inline">\(\lambda\)</span> is the tuning parameter which determines the amount of constraint placed on the coefficients of our model. I have chosen this model because it highlights a few important concepts in machine learning:</p>
 <ol style="list-style-type: decimal">
-<li><p><strong>Cross Validation:</strong> This model uses 5-fold cross-validation on the dataset to pick the best (balanced error rate and generalizability) model.</p></li>
-<li><p><strong>Parameter Tuning</strong> This model executes an iterative process to tune the parameters <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\lambda\)</span> in a way that minimizes the mean squared error(MSE).</p></li>
-<li><p><strong>Simplicity</strong> Regression modelsn (especially when they use shrinkage methods such as Elastic Net) are very attractive in their simplicity and interpretability. Although nonparametric models such as GAMS, Random Forrest, and ANN’s can be more effective when the data is messy, regression models are hard to beat when the data is linear. In this case our Elastic Net model is good for both predicting, and inference. By analyzing the coefficients’ we can get an idea for how certain features affect the outcome metric. In practice, understanding these effects can lead to actionable measures for performance improvement.</p></li>
+<li><p><strong>Cross Validation:</strong> This model uses 5-fold cross-validation on the dataset to pick the best (balance between error rate and generalizability) model.</p></li>
+<li><p><strong>Parameter Tuning</strong> This model executes an iterative process to tune the parameters <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\lambda\)</span> in a way that minimizes the mean squared error (MSE).</p></li>
+<li><p><strong>Simplicity</strong> Regression models (especially when they use shrinkage methods such as Elastic Net) are very attractive in their simplicity and interpretability. Although nonparametric models such as GAMS, Random Forrest, and ANN’s can be more effective, regression models are hard to beat in their simplicity and efficacy when the data is linear. In this case our Elastic Net model is good for both predicting, and inference. By analyzing the coefficients’ we can get an idea for how certain features affect the outcome metric. In practice, understanding these effects can lead to actionable measures for performance improvement.</p></li>
 </ol>
 </div>
 <div id="model-buidling" class="section level2">
@@ -244,17 +244,15 @@ data = dataWithSubject[,!(names(dataWithSubject)%in% c(&quot;subject.&quot;,&quo
 </div>
 <div id="run-model" class="section level3">
 <h3>Run Model</h3>
-<p>Now we will run our data through our ML Algorithm <code>optimumElastic()</code> which takes our data as well as the desired response variable in as arguments, uses cross validation to determine the optimal tunes of <span class="math inline">\(\lambda\)</span> as it correspond to its respecitve <span class="math inline">\(\alpha\)</span> value (over a sequence from <span class="math inline">\(\alpha = (0.5,0.95)\)</span>), and returns a list of error rates as they relate to each <span class="math inline">\(\alpha\)</span> value as well as the <span class="math inline">\(\alpha\)</span> value that yields the lowest error rate. The source code for function <code>optimumElastic()</code> can be found in Appendix 1 in the <strong>Source Code</strong> tab at the top of this web page</p>
-<pre class="r"><code>#Determine best Model
-library(glmnet)</code></pre>
-<pre><code>## Loading required package: Matrix</code></pre>
-<pre><code>## Loading required package: foreach</code></pre>
-<pre><code>## Loaded glmnet 2.0-13</code></pre>
-<pre class="r"><code>set.seed(1234)
+<p>Now we will run our data through our ML Algorithm <code>optimumElastic()</code> which takes our data and the desired response variable in as arguments, uses cross validation to determine the optimal tunes of <span class="math inline">\(\lambda\)</span> as it correspond to its respecitve <span class="math inline">\(\alpha\)</span> value (over a sequence from <span class="math inline">\(\alpha = (0.5,0.95)\)</span>), and returns a list of error rates as they relate to each <span class="math inline">\(\alpha\)</span> value as well as the <span class="math inline">\(\alpha\)</span> value that yields the lowest error rate. The source code for function <code>optimumElastic()</code> can be found in Appendix 1 in the <strong>Source Code</strong> tab at the top of this web page.</p>
+<pre class="r"><code>library(glmnet)
+#Determine best Model
+set.seed(1234)
 pInfoList = optimumElastic(data,&quot;motor_UPDRS&quot;)</code></pre>
 <p><img src="prediction_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
 <p>We can see that the lowest error rate is indicated by the red point in the above plot and corresponds to the best elastic net model for our data. In this case <span class="math inline">\(\alpha = 0.6\)</span></p>
-<p>We will now visualize how the optimal <span class="math inline">\(\lambda\)</span> was chosen for this model. <img src="prediction_files/figure-html/unnamed-chunk-5-1.png" width="672" /> The above plot visualizes how our mean cross validated error rate (MCVE) changes as <span class="math inline">\(\lambda\)</span> increases. The solid blue line corresponds to the <span class="math inline">\(\lambda\)</span> value that yields the minimum MCVE, and the dashed line corresponds to the value the is 1 standard error from this minimum value. Generally, anything in this range is a valid selection, however for our prediction model we are interested in the minimum.</p>
+<p>Next, we will visualize how the optimal <span class="math inline">\(\lambda\)</span> was chosen for this model. <img src="prediction_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p>The above plot visualizes how our mean cross validated error rate (MCVE) changes as <span class="math inline">\(\lambda\)</span> increases. The solid blue line corresponds to the <span class="math inline">\(\lambda\)</span> value that yields the minimum MCVE, and the dashed line corresponds to the value the is 1 standard error from this minimum value. Generally, anything in this range is a valid selection, however for our prediction model we are interested in the minimum.</p>
 <p><img src="prediction_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
 <p>Similarly, the above plot shows our error rate as a function of <span class="math inline">\(\ln(\lambda)\)</span>. The dashed red line is value of <span class="math inline">\(\ln(\lambda)\)</span> that minimizes our error rate, and the dashed black line is the value that falls within 1 standard error of our minimum.</p>
 </div>
@@ -263,15 +261,14 @@ pInfoList = optimumElastic(data,&quot;motor_UPDRS&quot;)</code></pre>
 <p>Now we are going to use our model to predict <code>motor_UPDRS</code>. We will also look at some diagnostic plots to make sure that the residuals in our model uphold the assumptions of independence, normality and homoscedasticity.</p>
 <pre class="r"><code>##Make Prediction
 yHat =predict(cvElastic,testMat,s = &quot;lambda.min&quot;)</code></pre>
-<pre><code>## Warning: package &#39;ggplot2&#39; was built under R version 3.4.4</code></pre>
 <p><img src="prediction_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
 <p>The above plot shows the residuals as a function of our fitted values. No trend is observed and the variance of the residuals appear constant. Therefore, our assumptions of independence and homoscedasticity are upheld. Next we will look at our assumption of normality.</p>
 <p><img src="prediction_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
-<p>We can see in the above Q-Q plot that there may be slight deviations from normality, however, the assumption of normality is relatively flexible, especially in the context of prediction adn therefore we can conclude that our model is valid for prdictions.</p>
+<p>We can see in the above Q-Q plot that there may be slight deviations from normality, however, the assumption of normality is relatively flexible, especially in the context of prediction and therefore we can conclude that our model is valid for predictions.</p>
 </div>
 <div id="final-model" class="section level3">
 <h3>Final Model</h3>
-<p>We will now look at the coefficient values generated for our final model. Notice that we were able to obtain an MSE of about 57.2 while using fewer predictors than that of a full model (simplicity). The chosen features and their corresponding coefficient estimates are seen in the table below</p>
+<p>We will now look at the coefficient values generated for our final model. Notice that we were able to obtain an MSE of about 57.2 while using fewer predictors than that of a full model. This is one of the benefits of shrinkage models. The chosen features and their corresponding coefficient estimates are seen in the table below</p>
 <pre><code>## [1] 57.20176</code></pre>
 <pre><code>## 20 x 1 sparse Matrix of class &quot;dgCMatrix&quot;
 ##                           1
@@ -299,18 +296,12 @@ yHat =predict(cvElastic,testMat,s = &quot;lambda.min&quot;)</code></pre>
 <div id="comparision-to-a-random-forest" class="section level3">
 <h3>Comparision to a Random Forest</h3>
 <p>Arguably, Random Forests are the gold standard for quick and dirt prediction models. We will now generate a random forest model with 100 trees and compare the MSE of prediction to that of our elastic net model.</p>
-<pre><code>## Warning: package &#39;randomForest&#39; was built under R version 3.4.4</code></pre>
-<pre><code>## randomForest 4.6-14</code></pre>
-<pre><code>## Type rfNews() to see new features/changes/bug fixes.</code></pre>
-<pre><code>## 
-## Attaching package: &#39;randomForest&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:ggplot2&#39;:
-## 
-##     margin</code></pre>
-<pre class="r"><code>mean((rfPred - testSet$motor_UPDRS)^2)</code></pre>
+<pre class="r"><code>#Calculate MSE of our Random Forest Model
+mean((rfPred - testSet$motor_UPDRS)^2)</code></pre>
 <pre><code>## [1] 11.81427</code></pre>
 <p>Notice thate our random forest model gives us a smaller MSE prediction rate. Now we will look at how each feature influences our error rate.</p>
-<pre class="r"><code>varImpPlot(rf, main = &quot;Random Forest VIF Plot&quot;)</code></pre>
+<pre class="r"><code>#Visualize Variable Importance
+varImpPlot(rf, main = &quot;Random Forest VIF Plot&quot;)</code></pre>
 <p><img src="prediction_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
 </div>
 <div id="conclusion" class="section level3">
