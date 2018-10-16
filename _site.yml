@@ -7,7 +7,7 @@ navbar:
       href: dataDescription.html
     - text: "Exploratory Analysis"
       href: exploratoryAnalysis.html
-    - text: "Predictive Model"
+    - text: "Prediction Models"
       href: prediction.html
   right:
     - icon: fa-envelope fa-lg

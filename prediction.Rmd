@@ -67,13 +67,13 @@ optimumElastic = function(dat,resp){
 
 ## Elastic Net Model
 
-The Machine Learning Algorithm I have chosen is an Elastic Net, regression model. The model is defined by minimizing the equation $$\frac{(1-\alpha)}{2}*||\beta||_2^2+\frac{\alpha}{2}*||\beta||_1$$
+The Machine Learning Algorithm I have chosen is an Elastic Net, regression model. The model is defined by minimizing the term $$\frac{(1-\alpha)}{2}*||\beta||_2^2+\frac{\alpha}{2}*||\beta||_1$$
 
-when that, $$||\beta||_2 = \sqrt{\lambda\sum_{j=1}^p\beta_j^2}$$
+when, $$||\beta||_2 = \sqrt{\lambda\sum_{j=1}^p\beta_j^2}$$
 
 and, $$||\beta||_1 = \lambda\sum_{j=1}^p |\beta_j|$$
 
-I have chosen this model because it highlights a few important concepts in machine learning:
+In this case $\alpha$ determines the amount of weight given to LASSO and Ridge shrinkage penalties, and $\lambda$ is the tuning parameter which determines the amount of contraint placed on the coefficients of our model.  I have chosen this model because it highlights a few important concepts in machine learning:
 
 1) **Cross Validation:** This model uses 5-fold cross-validation on the dataset to pick the best (balanced error rate and generalizability) model.
 
@@ -166,4 +166,37 @@ ggplot(data = diagFrame, aes(sample = resi))+
 
 We can see in the above Q-Q plot that there may be slight deviations from normality, however, the assumption of normality is relatively flexible, especially in the context of prediction adn therefore we can conclude that our model is valid for prdictions.
 
-###Comparison to LSE
+###Final Model
+We will now look at the coefficient values generated for our final model. Notice that we were able to obtain an MSE of about 57.2 while using fewer predictors than that of a full model (simplicity). The chosen features and their corresponding coefficient estimates are seen in the table below
+```{r, echo=FALSE}
+set.seed(1234)
+mean((yHat-testSet$motor_UPDRS)^2)
+predict(cvElastic,testMat,type = "coefficients")
+```
+
+###Comparision to a Random Forest
+Arguably, Random Forests are the gold standard for quick and dirt prediction models. We will now generate a random forest model with 100 trees and compare the MSE of prediction to that of our elastic net model.
+
+```{r, echo = FALSE}
+library(randomForest)
+set.seed(1234)
+rf = randomForest(motor_UPDRS~.,data = trainingSet, ntree = 100, importance=TRUE)
+rfPred = predict(rf,testSet)
+```
+
+```{r}
+mean((rfPred - testSet$motor_UPDRS)^2)
+```
+Notice thate our random forest model gives us a smaller MSE prediction rate. Now we will look at how each feature influences our error rate.
+
+```{r}
+varImpPlot(rf, main = "Random Forest VIF Plot")
+```
+
+
+###Conclusion
+We can see that the MSE of prediction is much smaller when we use a random forest model, however, computation time is also larger, and the model uses all of the predictors. In this case we would need to consult our client to determine wheter or not the sole focus of the model is in prediction (in which case we could continue to tune our random forest model), or if they are interested in a predictive model that is simple and easy to interpret (in which case we we would use our elastic net model).
+
+
+
+
