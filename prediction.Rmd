@@ -80,11 +80,35 @@ testSet = setTrainTest(data,"test",1)
 trainingMat = model.matrix(motor_UPDRS ~ ., data = trainingSet)
 testMat = model.matrix(motor_UPDRS ~ ., data = testSet)
 
+##Create Model
 cvElastic = cv.glmnet(trainingMat,trainingSet$motor_UPDRS,alpha=pInfoList$alphaVect[pInfoList$bestAlphaIndex])
-plot(cvElastic$lambda,cvElastic$cvm, type = "l", main = "Elastic Net")
-abline(v = cvElastic$lambda.min)
-yHat =predict(cvElastic,testMat,s = "lambda.min")
-plot(yHat,(testSet$motor_UPDRS-yHat))
+par(1,2)
+plot(cvElastic$lambda,cvElastic$cvm, type = "l", main = "Elastic Net",xlab = "Cross Validated Lambda", ylab = "Mean Cross Validated Error")
+abline(v = cvElastic$lambda.min,col = "blue",lwd=1)
+abline(h = min(cvElastic$cvm),col = "blue", lwd=1)
+abline(v = cvElastic$lambda.1se,col = "blue",lwd=1, lty=2)
 plot(cvElastic)
 abline(v = log(cvElastic$lambda.min),col= "red", lwd=3, lty=2)
+
+##Make Prediction
+yHat =predict(cvElastic,testMat,s = "lambda.min")
+
+##Residual Analysis
+diagFrame = data.frame(predVal = c(yHat),
+                       realVal = c(testSet$motor_UPDRS),
+                       resi = c((testSet$motor_UPDRS-yHat)))
+library(ggplot2)
+ggplot(data = diagFrame, aes(x=predVal,y=resi))+
+  geom_point()+
+  geom_smooth(method = "lm")+
+  ggtitle("Residuals vs. Fitted")+
+  xlab("Fitted Values")+
+  ylab("Residuals")
+
+ggplot(data = diagFrame, aes(sample = resi))+
+  stat_qq()+
+  stat_qq_line()+
+  ggtitle("Normal Q-Q")+
+  xlab("Theoretical Quantiles")+
+  ylab("Standardized Residuals")
 ```
