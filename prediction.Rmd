@@ -1,5 +1,8 @@
+---
+title: "Prediction With Optimal Elastic Net Model"
+---
 
-```{r}
+```{r,echo=FALSE}
 ###
 # Function: setTrainTest
 setTrainTest = function(dat,option="train",foldToTest=1){
@@ -62,17 +65,50 @@ optimumElastic = function(dat,resp){
 }
 ```
 
+## Elastic Net Model
+
+The Machine Learning Algorithm I have chosen is an Elastic Net, regression model. The model is defined by minimizing the equation $$\frac{(1-\alpha)}{2}*||\beta||_2^2+\frac{\alpha}{2}*||\beta||_1$$
+
+when that, $$||\beta||_2 = \sqrt{\lambda\sum_{j=1}^p\beta_j^2}$$
+
+and, $$||\beta||_1 = \lambda\sum_{j=1}^p |\beta_j|$$
+
+I have chosen this model because it highlights a few important concepts in machine learning:
+
+1) **Cross Validation:** This model uses 5-fold cross-validation on the dataset to pick the best (balanced error rate and generalizability) model.
+
+2) **Parameter Tuning** This model executes an iterative process to tune the parameters $\alpha$ and $\lambda$ in a way that minimizes the mean squared error(MSE).
+
+3) **Simplicity** Regression modelsn (especially when they use shrinkage methods such as Elastic Net) are very attractive in their simplicity and interpretability. Although nonparametric models such as GAMS, Random Forrest, and ANN's can be more effective when the data is messy, regression models are hard to beat when the data is linear. In this case our Elastic Net model is good for both predicting, and inference. By analyzing the coefficients' we can get an idea for how certain features affect the outcome metric. In practice, understanding these effects can lead to actionable measures for performance improvement.
+
+##Model Buidling
+###Data Set up
+To begin our analysis we will set up our data to exclude the features we are not interested in using as predictors. Although the main aim of the data is to use only the 16 voice measures to predict the motor and total UPDRS scores, we will include the features `age` and `sex` as they may contain valuable information as well. Since our interest is in predicting the `motor_UPDRS` feature, we will exclude the `total_UPDRS` from our model as well as the features `subject.`(subject ID), and `test_time`.
+
 ```{r}
 #Predict Motor UPDRS Score
-#Exclude Subject ID and Total Score from model
+#Exclude Subject ID, Total Score, and time in trial, from model
 data = dataWithSubject[,!(names(dataWithSubject)%in% c("subject.","total_UPDRS","test_time"))]
+```
 
+### Run Model
+Now we will run our data through our ML Algorithm `optimumElastic()` which takes our data as well as the desired response variable in as arguments, uses cross validation to determine the optimal tunes of $\lambda$ as it correspond to its respecitve $\alpha$ value (over a sequence from $\alpha = (0.5,0.95)$), and returns a list of error rates as they relate to each $\alpha$ value as well as the $\alpha$ value that yields the lowest error rate. The source code for function `optimumElastic()` can be found in Appendix 1 in the **Source Code** tab at the top of this web page
+```{r}
 #Determine best Model
+library(glmnet)
 set.seed(1234)
 pInfoList = optimumElastic(data,"motor_UPDRS")
+```
 
-plot(pInfoList$alphaVect, pInfoList$errorRate)
+```{r,echo=FALSE}
+#Visualize Error Rate as a function of Alpha
+plot(pInfoList$alphaVect, pInfoList$errorRate,col=ifelse(pInfoList$alphaVect==pInfoList$alphaVect[pInfoList$bestAlphaIndex], "red", "black"),main = "Error Rate on Alpha",xlab = "Alpha Value",ylab = "Error Rate")
+```
 
+We can see that the lowest error rate is indicated by the red point in the above plot and corresponds to the best elastic net model for our data. In this case $\alpha = 0.6$
+
+We will now visualize how the optimal $\lambda$ was chosen for this model.
+```{r, echo = FALSE}
 #visualize best model
 #Divide into Training and Test
 trainingSet = setTrainTest(data,"train",1)
@@ -82,17 +118,28 @@ testMat = model.matrix(motor_UPDRS ~ ., data = testSet)
 
 ##Create Model
 cvElastic = cv.glmnet(trainingMat,trainingSet$motor_UPDRS,alpha=pInfoList$alphaVect[pInfoList$bestAlphaIndex])
-par(1,2)
-plot(cvElastic$lambda,cvElastic$cvm, type = "l", main = "Elastic Net",xlab = "Cross Validated Lambda", ylab = "Mean Cross Validated Error")
+plot(cvElastic$lambda,cvElastic$cvm, type = "l", main = "Elastic Net Alpha = 0.6",xlab = "Cross Validated Lambda", ylab = "Mean Cross Validated Error")
 abline(v = cvElastic$lambda.min,col = "blue",lwd=1)
 abline(h = min(cvElastic$cvm),col = "blue", lwd=1)
 abline(v = cvElastic$lambda.1se,col = "blue",lwd=1, lty=2)
+```
+The above plot visualizes how our mean cross validated error rate (MCVE) changes as $\lambda$ increases. The solid blue line corresponds to the $\lambda$ value that yields the minimum MCVE, and the dashed line corresponds to the value the is 1 standard error from this minimum value. Generally, anything in this range is a valid selection, however for our prediction model we are interested in the minimum.
+
+```{r,echo = FALSE}
 plot(cvElastic)
 abline(v = log(cvElastic$lambda.min),col= "red", lwd=3, lty=2)
+```
 
+Similarly, the above plot shows our error rate as a function of $\ln(\lambda)$. The dashed red line is value of $\ln(\lambda)$ that minimizes our error rate, and the dashed black line is the value that falls within 1 standard error of our minimum.
+
+###Predictions
+Now we are going to use our model to predict `motor_UPDRS`. We will also look at some diagnostic plots to make sure that the residuals in our model uphold the assumptions of independence, normality and homoscedasticity.
+```{r}
 ##Make Prediction
 yHat =predict(cvElastic,testMat,s = "lambda.min")
+```
 
+```{r, echo=FALSE}
 ##Residual Analysis
 diagFrame = data.frame(predVal = c(yHat),
                        realVal = c(testSet$motor_UPDRS),
@@ -104,7 +151,11 @@ ggplot(data = diagFrame, aes(x=predVal,y=resi))+
   ggtitle("Residuals vs. Fitted")+
   xlab("Fitted Values")+
   ylab("Residuals")
+```
 
+The above plot shows the residuals as a function of our fitted values. No trend is observed and the variance of the residuals appear constant. Therefore, our assumptions of independence and homoscedasticity are upheld. Next we will look at our assumption of normality.
+
+```{r,echo=FALSE}
 ggplot(data = diagFrame, aes(sample = resi))+
   stat_qq()+
   stat_qq_line()+
@@ -112,3 +163,7 @@ ggplot(data = diagFrame, aes(sample = resi))+
   xlab("Theoretical Quantiles")+
   ylab("Standardized Residuals")
 ```
+
+We can see in the above Q-Q plot that there may be slight deviations from normality, however, the assumption of normality is relatively flexible, especially in the context of prediction adn therefore we can conclude that our model is valid for prdictions.
+
+###Comparison to LSE
