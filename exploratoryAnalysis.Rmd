@@ -1,3 +1,24 @@
-```{r}
+---
+title: "Exploratory Analysis"
+---
+
+```{r, echo = FALSE}
 dataWithSubject = read.csv("C:/Users/James Moore/Documents/JGMoore44.github.io/files/parkinsons_updrs.data")
+dataExploratory = dataWithSubject
+```
+
+###Introduction
+This exploratory analysis will primarily use histograms, density curves, boxplots and scatter plots to highlight aspects of mean, variance, and correlations between the various features of our dataset. Before beginning our exploratory analysis we will code sex as a factor, as many of our visualizaitons will compare the difference between men and women.
+```{r}
+#Code Sex as a Factor
+dataExploratory$sex = factor(dataExploratory$sex)
+```
+
+###Variance Analysis
+In our prediction model we are focusing on the response `motor_UPDRS` for that reason we will begin by visualizing the variance of this metric, as many issues with prediction and inference can arise when variance of a feature is not properly understood.
+
+```{r, echo=FALSE,warning=FALSE,message=FALSE}
+library(ggplot2)
+ggplot(data = dataExploratory, aes(x = motor_UPDRS, color = sex))+
+  geom_freqpoly()
 ```
