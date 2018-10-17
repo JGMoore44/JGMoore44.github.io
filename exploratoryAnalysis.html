@@ -220,15 +220,15 @@ $(document).ready(function () {
 
 <div id="introduction" class="section level3">
 <h3>Introduction</h3>
-<p>This exploratory analysis will primarily use histograms, density curves, boxplots and scatter plots to highlight aspects of mean, variance, and correlations between the various features of our dataset. Before beginning our exploratory analysis we will code sex as a factor, as many of our visualizaitons will compare the difference between men and women.</p>
+<p>This exploratory analysis will primarily use density curves, boxplots and scatter plots to highlight aspects of centrality, variance, and correlations between the various features of our dataset. Before beginning our exploratory analysis we will code sex as a factor, as many of our visualizaitons will compare the difference between men and women.</p>
 <pre class="r"><code>#Code Sex as a Factor
 dataExploratory$sex = factor(dataExploratory$sex)</code></pre>
 </div>
 <div id="variance-analysis" class="section level2">
 <h2>Variance Analysis</h2>
-<p>In our prediction model we are focusing on the response <code>motor_UPDRS</code> for that reason we will begin by visualizing the variance of this metric, as many issues with prediction and inference can arise when variance of a feature is not properly understood.</p>
+<p>In our prediction model we are focusing on the response <code>motor_UPDRS</code> for that reason we will begin by visualizing the distribution of this metric. The below plot is helpful in understanding variance within this metric. Many issues with prediction and inference can arise when variance of a feature is not properly understood.</p>
 <p><img src="exploratoryAnalysis_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
-<p>The above plot figure shows the density curve for motor UPDRS score as it relates the gender. The red curve represents males and the blue curve represents females. At a glance we can see that Male’s appear to have less variability in their motor scores than females. This is confirmed below when we calculate the variance of each group.</p>
+<p>The above figure shows the density curve for motor UPDRS score as it relates the gender. The red curve represents males and the blue curve represents females. At a glance we can see that males appear to have less variability in their motor scores than females. This is confirmed below when we calculate the variance of each group.</p>
 <pre class="r"><code>#Variance of Motor Score for Men
 var(dataExploratory$motor_UPDRS[which(dataExploratory$sex==0)])</code></pre>
 <pre><code>## [1] 62.27828</code></pre>
@@ -258,19 +258,24 @@ var(dataExploratory$total_UPDRS[which(dataExploratory$sex==1)])</code></pre>
 <h3>Between motor and total score.</h3>
 <p>We will now look at the assocation between motor and total UPDRS score. This is visualized below in the scatter plot.</p>
 <p><img src="exploratoryAnalysis_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
-<p>Higher motor scores tend to be associated with higher total scores. Another interesting take away from this plot is that there does not appear to be any indication that males have higher scores than females.</p>
+<p>Higher motor scores tend to be associated with higher total scores. Another interesting take away from this plot is that there does not appear to be any clear indication that one gender has higher scores than the other.</p>
+</div>
+<div id="age-and-score" class="section level3">
+<h3>Age and Score</h3>
+<p><img src="exploratoryAnalysis_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p>We can see that there does not appear to be a clear assocation between age and scores based on this scatter plot.</p>
 </div>
 <div id="jitter-metrics" class="section level3">
 <h3>Jitter Metrics</h3>
-<p><img src="exploratoryAnalysis_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p><img src="exploratoryAnalysis_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
 </div>
 <div id="shimmer-metrics" class="section level3">
 <h3>Shimmer Metrics</h3>
-<p><img src="exploratoryAnalysis_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p><img src="exploratoryAnalysis_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
 </div>
 <div id="remaining-voice-metrics" class="section level3">
 <h3>Remaining Voice Metrics</h3>
-<p><img src="exploratoryAnalysis_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p><img src="exploratoryAnalysis_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
 </div>
 <div id="conclusion" class="section level3">
 <h3>Conclusion</h3>
