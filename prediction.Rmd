@@ -199,7 +199,7 @@ varImpPlot(rf, main = "Random Forest Variable Importance Plot")
 
 
 ###Conclusion
-We can see that the MSE of prediction is much smaller when we use a random forest model, however, computation time is also larger, and the model uses all of the predictors. In this case we would need to consult our client to determine wheter or not the sole focus of the model is in prediction (in which case we could continue to tune our random forest model), or if they are interested in a predictive model that is simple and easy to interpret (in which case we we would use our elastic net model).
+We can see that the MSE of prediction is much smaller when we use a random forest model, however, computation time is also larger, and the model uses all of the predictors. In this case we would need to consult our client to determine whether or not the sole focus of the model is in prediction (in which case we could continue to tune our random forest model), or if they are also interested in simplicy and ease of interpretation (in which case we we would use our elastic net model).
 
 
 

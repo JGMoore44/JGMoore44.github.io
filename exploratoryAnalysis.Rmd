@@ -8,14 +8,14 @@ dataExploratory = dataWithSubject
 ```
 
 ###Introduction
-This exploratory analysis will primarily use histograms, density curves, boxplots and scatter plots to highlight aspects of mean, variance, and correlations between the various features of our dataset. Before beginning our exploratory analysis we will code sex as a factor, as many of our visualizaitons will compare the difference between men and women.
+This exploratory analysis will primarily use density curves, boxplots and scatter plots to highlight aspects of centrality, variance, and correlations between the various features of our dataset. Before beginning our exploratory analysis we will code sex as a factor, as many of our visualizaitons will compare the difference between men and women.
 ```{r}
 #Code Sex as a Factor
 dataExploratory$sex = factor(dataExploratory$sex)
 ```
 
 ##Variance Analysis
-In our prediction model we are focusing on the response `motor_UPDRS` for that reason we will begin by visualizing the variance of this metric, as many issues with prediction and inference can arise when variance of a feature is not properly understood.
+In our prediction model we are focusing on the response `motor_UPDRS` for that reason we will begin by visualizing the distribution of this metric. The below plot is helpful in understanding variance within this metric. Many issues with prediction and inference can arise when variance of a feature is not properly understood.
 
 ```{r, echo=FALSE,warning=FALSE,message=FALSE}
 library(ggplot2)
@@ -27,7 +27,7 @@ ggplot(data = dataExploratory, aes(x = motor_UPDRS,color = sex))+
   xlab("Motor UPDRS Score")
 ```
 
-The above plot figure shows the density curve for motor UPDRS score as it relates the gender. The red curve represents males and the blue curve represents females. At a glance we can see that Male's appear to have less variability in their motor scores than females. This is confirmed below when we calculate the variance of each group.
+The above figure shows the density curve for motor UPDRS score as it relates the gender. The red curve represents males and the blue curve represents females. At a glance we can see that males appear to have less variability in their motor scores than females. This is confirmed below when we calculate the variance of each group.
 
 ```{r}
 #Variance of Motor Score for Men
@@ -97,7 +97,21 @@ ggplot(data = dataExploratory, aes(x = motor_UPDRS, y = total_UPDRS,color = sex)
   ylab("Total Score")
 ```
 
-Higher motor scores tend to be associated with higher total scores. Another interesting take away from this plot is that there does not appear to be any indication that males have higher scores than females.
+Higher motor scores tend to be associated with higher total scores. Another interesting take away from this plot is that there does not appear to be any clear indication that one gender has higher scores than the other.
+
+###Age and Score
+
+```{r, echo = FALSE}
+ggplot(data = dataExploratory, aes(x = age, y = motor_UPDRS,color = sex))+
+  geom_point()+
+  scale_color_discrete(name = "Sex",
+                       label= c("Male", "Female"))+
+  ggtitle("Motor Score on Age")+
+  xlab("Age")+
+  ylab("Motor Score")
+```
+
+We can see that there does not appear to be a clear assocation between age and scores based on this scatter plot.
 
 ###Jitter Metrics
 
