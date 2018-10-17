@@ -14,13 +14,13 @@ This exploratory analysis will primarily use histograms, density curves, boxplot
 dataExploratory$sex = factor(dataExploratory$sex)
 ```
 
-###Variance Analysis
+##Variance Analysis
 In our prediction model we are focusing on the response `motor_UPDRS` for that reason we will begin by visualizing the variance of this metric, as many issues with prediction and inference can arise when variance of a feature is not properly understood.
 
 ```{r, echo=FALSE,warning=FALSE,message=FALSE}
 library(ggplot2)
 ggplot(data = dataExploratory, aes(x = motor_UPDRS,color = sex))+
-  geom_density()+
+  geom_density(size = 1.25)+
   scale_color_discrete(name = "Sex",
                       labels = c("Male","Female"))+
   ggtitle("Density Curves for motor UPDRS score")+
@@ -41,7 +41,7 @@ It can also be noted that, by group, the motor score is multimodal, meaning meas
 ```{r, echo=FALSE,warning=FALSE,message=FALSE}
 library(ggplot2)
 ggplot(data = dataExploratory, aes(x = total_UPDRS,color = sex))+
-  geom_density()+
+  geom_density(size = 1.25)+
   scale_color_discrete(name = "Sex",
                       labels = c("Male","Female"))+
   ggtitle("Density Curves for Total UPDRS score")+
@@ -58,18 +58,22 @@ var(dataExploratory$total_UPDRS[which(dataExploratory$sex==1)])
 
 In conclusion, Men have less variability in motor UPDRS scores, whereas women have less variability in total UPDRS score. Whether or not these differences in variability are significant would require an F-Test on the ratio of variance for each group.
 
-##Box Plots
+###Box Plots
 Now we will use boxplots to get another perspective on the relationship between gender and motor/total UPDRS scores.
 
 ```{r,echo=FALSE,warning=FALSE,message=FALSE}
 library(cowplot)
 totalBox = ggplot(data = dataExploratory, aes(x = sex, y = total_UPDRS))+
-  geom_boxplot()+
+  geom_boxplot(fill = "red",alpha = 0.8, color = "blue",size = 1.5)+
+  scale_x_discrete(name = "Sex",
+                   label= c("Male", "Female"))+
   ggtitle("Total Score on Gender")+
   ylab("Total Score")+
   xlab("Gender")
 motorBox = ggplot(data = dataExploratory, aes(x = sex, y = motor_UPDRS))+
-  geom_boxplot()+
+  geom_boxplot(fill = "red",alpha=0.8, color = "blue",size = 1.5)+
+  scale_x_discrete(name = "Sex",
+                   label= c("Male", "Female"))+
   ggtitle("Motor Score on Gender")+
   ylab("Motor Score")+
   xlab("Gender")
@@ -79,7 +83,8 @@ plot_grid(motorBox,totalBox)
 
 The differing variability of total score between men and women is still clear from the differing IQR's shown in the boxplots. However, we are unable to capture the multimodality of the data which can be a potential shortcoming of boxplots. One added benefit of these plots is that we can get a feel for any outliers. It does not appear from these plots that our data has any outlying observations.
 
-###Correlations/Associations
+##Correlations/Associations
+###Between motor and total score.
 We will now look at the assocation between motor and total UPDRS score. This is visualized below in the scatter plot.
 
 ```{r, echo = FALSE}
@@ -91,3 +96,25 @@ ggplot(data = dataExploratory, aes(x = motor_UPDRS, y = total_UPDRS,color = sex)
   xlab("Motor Score")+
   ylab("Total Score")
 ```
+
+Higher motor scores tend to be associated with higher total scores. Another interesting take away from this plot is that there does not appear to be any indication that males have higher scores than females.
+
+###Jitter Metrics
+
+```{r,echo=FALSE,warning=FALSE,message=FALSE}
+pairs(dataExploratory[,7:11],main = "Correlation Matrix for `Jitter` Feature")
+```
+
+###Shimmer Metrics
+
+```{r,echo=FALSE,warning=FALSE,message=FALSE}
+pairs(dataExploratory[,12:17],main = "Correlation Matrix for `Shimmer` Feature")
+```
+
+###Remaining Voice Metrics
+```{r,echo=FALSE,warning=FALSE,message=FALSE}
+pairs(dataExploratory[,18:22],main = "Correlation Matrix for Remaining Voice Features")
+```
+
+###Conclusion
+The above correlation matrices indicate that there may be associations between the Jitter metrics (i.e. Abs., PPQ5,...) as well as Shimmer metrics. This can lead to multicollinearity in our final model. Therefore dimension reduction methods such as principal component analysis or shrinkage models are likely appropriate for further analysis.

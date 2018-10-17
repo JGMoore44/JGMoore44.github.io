@@ -11,7 +11,7 @@
 
 
 
-<title></title>
+<title>Exploratory Analysis</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -190,12 +190,6 @@ $(document).ready(function () {
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="contact.html">
-    <span class="fa fa-envelope fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="https://github.com/JGMoore44">
     <span class="fa fa-github fa-lg"></span>
      
@@ -216,11 +210,71 @@ $(document).ready(function () {
 
 
 
+<h1 class="title toc-ignore">Exploratory Analysis</h1>
 
 </div>
 
 
-<pre class="r"><code>dataWithSubject = read.csv(&quot;C:/Users/James Moore/Documents/JGMoore44.github.io/files/parkinsons_updrs.data&quot;)</code></pre>
+<div id="introduction" class="section level3">
+<h3>Introduction</h3>
+<p>This exploratory analysis will primarily use histograms, density curves, boxplots and scatter plots to highlight aspects of mean, variance, and correlations between the various features of our dataset. Before beginning our exploratory analysis we will code sex as a factor, as many of our visualizaitons will compare the difference between men and women.</p>
+<pre class="r"><code>#Code Sex as a Factor
+dataExploratory$sex = factor(dataExploratory$sex)</code></pre>
+</div>
+<div id="variance-analysis" class="section level2">
+<h2>Variance Analysis</h2>
+<p>In our prediction model we are focusing on the response <code>motor_UPDRS</code> for that reason we will begin by visualizing the variance of this metric, as many issues with prediction and inference can arise when variance of a feature is not properly understood.</p>
+<p><img src="exploratoryAnalysis_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p>The above plot figure shows the density curve for motor UPDRS score as it relates the gender. The red curve represents males and the blue curve represents females. At a glance we can see that Male’s appear to have less variability in their motor scores than females. This is confirmed below when we calculate the variance of each group.</p>
+<pre class="r"><code>#Variance of Motor Score for Men
+var(dataExploratory$motor_UPDRS[which(dataExploratory$sex==0)])</code></pre>
+<pre><code>## [1] 62.27828</code></pre>
+<pre class="r"><code>#Variance of Motor Score for Women
+var(dataExploratory$motor_UPDRS[which(dataExploratory$sex==1)])</code></pre>
+<pre><code>## [1] 74.09297</code></pre>
+<p>It can also be noted that, by group, the motor score is multimodal, meaning measures of centrality (mean, median, mode) must be considered with caution. Interestingly, the density plot for total UPDRS score does not yield the same result. If we look at the plot below, it appears that women have less variability in their total UPDRS scores.</p>
+<p><img src="exploratoryAnalysis_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p>This observation is confirmed when we calculate the variance for each group</p>
+<pre class="r"><code>#Variance of Total Score, Male
+var(dataExploratory$total_UPDRS[which(dataExploratory$sex==0)])</code></pre>
+<pre><code>## [1] 121.099</code></pre>
+<pre class="r"><code>#Variance of Total Score, Female
+var(dataExploratory$total_UPDRS[which(dataExploratory$sex==1)])</code></pre>
+<pre><code>## [1] 97.018</code></pre>
+<p>In conclusion, Men have less variability in motor UPDRS scores, whereas women have less variability in total UPDRS score. Whether or not these differences in variability are significant would require an F-Test on the ratio of variance for each group.</p>
+<div id="box-plots" class="section level3">
+<h3>Box Plots</h3>
+<p>Now we will use boxplots to get another perspective on the relationship between gender and motor/total UPDRS scores.</p>
+<p><img src="exploratoryAnalysis_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p>The differing variability of total score between men and women is still clear from the differing IQR’s shown in the boxplots. However, we are unable to capture the multimodality of the data which can be a potential shortcoming of boxplots. One added benefit of these plots is that we can get a feel for any outliers. It does not appear from these plots that our data has any outlying observations.</p>
+</div>
+</div>
+<div id="correlationsassociations" class="section level2">
+<h2>Correlations/Associations</h2>
+<div id="between-motor-and-total-score." class="section level3">
+<h3>Between motor and total score.</h3>
+<p>We will now look at the assocation between motor and total UPDRS score. This is visualized below in the scatter plot.</p>
+<p><img src="exploratoryAnalysis_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p>Higher motor scores tend to be associated with higher total scores. Another interesting take away from this plot is that there does not appear to be any indication that males have higher scores than females.</p>
+</div>
+<div id="jitter-metrics" class="section level3">
+<h3>Jitter Metrics</h3>
+<p><img src="exploratoryAnalysis_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+</div>
+<div id="shimmer-metrics" class="section level3">
+<h3>Shimmer Metrics</h3>
+<p><img src="exploratoryAnalysis_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+</div>
+<div id="remaining-voice-metrics" class="section level3">
+<h3>Remaining Voice Metrics</h3>
+<p><img src="exploratoryAnalysis_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+</div>
+<div id="conclusion" class="section level3">
+<h3>Conclusion</h3>
+<p>The above correlation matrices indicate that there may be associations between the Jitter metrics (i.e. Abs., PPQ5,…) as well as Shimmer metrics. This can lead to multicollinearity in our final model. Therefore dimension reduction methods such as principal component analysis or shrinkage models are likely appropriate for further analysis.</p>
+<p>CORRELATIONS BETWEEN JITTER AND SHIMMER PREDS AND ASSOCIATION B/W NHR HNR RPDE DFA PPE, SHIMMER,JITTER AND MOTOR SCORE.</p>
+</div>
+</div>
 
 
 

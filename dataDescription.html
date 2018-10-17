@@ -11,7 +11,7 @@
 
 
 
-<title></title>
+<title>Data Description</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -185,17 +185,14 @@ $(document).ready(function () {
   <a href="exploratoryAnalysis.html">Exploratory Analysis</a>
 </li>
 <li>
-  <a href="prediction.html">Prediction Models</a>
+  <a href="prediction.html">Prediction Model</a>
+</li>
+<li>
+  <a href="sourceCode.html">Source Code</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="contact.html">
-    <span class="fa fa-envelope fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="https://github.com/JGMoore44">
     <span class="fa fa-github fa-lg"></span>
      
@@ -216,11 +213,23 @@ $(document).ready(function () {
 
 
 
+<h1 class="title toc-ignore">Data Description</h1>
 
 </div>
 
 
-
+<div id="parkinsons-telemonitoring-data-set" class="section level2">
+<h2>Parkinsons Telemonitoring Data Set</h2>
+<div id="about-the-data" class="section level3">
+<h3>About the Data</h3>
+<p>The ML Dataset that I have chosen is the “Oxford Parkinson’s Disease Telemonitoring Dataset”(<a href="http://archive.ics.uci.edu/ml/datasets/Parkinsons+Telemonitoring" class="uri">http://archive.ics.uci.edu/ml/datasets/Parkinsons+Telemonitoring</a>) from the University of California Irvine Machine Learning Repository.</p>
+<p>The dataset is composed of various biomedical voice measurements from 42 people with early-stage Parkinson’s disease to a clinical trial of a telemonitoring device. There are 5875 observations, and a total of 26 different features. The goal of this data is to predict motor and total UPDRS scores for each observation using the voice metrics in the dataset. A link to the full description of the dataset, and more information on the features can be found <a href="http://archive.ics.uci.edu/ml/datasets/Parkinsons+Telemonitoring">here.</a></p>
+</div>
+<div id="why-i-chose-this-set" class="section level3">
+<h3>Why I chose this set</h3>
+<p>I chose this dataset because it is in the domain of life sciences, is well structured clinical data for regression analysis, and can be used to both predict an outcome and to understand which metrics may be most influenctial when tracking UPDRS scores for people with Parkinson’s disease. This set also presents multicollinearity which is a common occurance in machine learning. In practice, it is useful to identify and account for this phenomenon.</p>
+</div>
+</div>
 
 
 

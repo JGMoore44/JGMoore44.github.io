@@ -92,7 +92,7 @@ data = dataWithSubject[,!(names(dataWithSubject)%in% c("subject.","total_UPDRS",
 ```
 
 ### Run Model
-Now we will run our data through our ML Algorithm `optimumElastic()` which takes our data and the desired response variable in as arguments, uses cross validation to determine the optimal tunes of $\lambda$ as it correspond to its respecitve $\alpha$ value (over a sequence from $\alpha = (0.5,0.95)$), and returns a list of error rates as they relate to each $\alpha$ value as well as the $\alpha$ value that yields the lowest error rate. The source code for function `optimumElastic()` can be found in Appendix 1 in the **Source Code** tab at the top of this web page.
+Now we will run our data through our ML Algorithm `optimumElastic()` which takes our data and the desired response variable in as arguments, uses cross validation to determine the optimal tunes of $\lambda$ as it correspond to its respecitve $\alpha$ value (over a sequence from $\alpha = (0.5,0.95)$), and returns a list of error rates as they relate to each $\alpha$ value as well as the $\alpha$ value that yields the lowest error rate. The source code for function `optimumElastic()` can be found in the **Source Code** tab at the top of this web page.
 
 ```{r,message=FALSE,warning=FALSE}
 library(glmnet)
@@ -194,7 +194,7 @@ Notice thate our random forest model gives us a smaller MSE prediction rate. Now
 
 ```{r}
 #Visualize Variable Importance
-varImpPlot(rf, main = "Random Forest VIF Plot")
+varImpPlot(rf, main = "Random Forest Variable Importance Plot")
 ```
 
 

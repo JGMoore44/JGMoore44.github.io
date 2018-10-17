@@ -8,7 +8,7 @@ The purpose of this website is to conduct analysis on a public dataset. The main
 
 2) Visualizations of the Statistics on the dataset, and some initial exploratory analysis is conducted in the **"Exploratory Analysis"** section.
 
-3) A report summarizing the results of applying an optimized elastic net model on the data to predict outcomes can be found in the **"Predictive Model"** section.
+3) A report summarizing the results of applying an optimized elastic net model on the data to predict outcomes can be found in the **"Prediction Model"** section.
 
 I decided during my undergraduate studies at the University of Iowa, and through my time as a Precision Analyst at [VIDA Diagnostics](https://vidadiagnostics.com/) that precision medicine is a field that I need to be in as I continue my professional development. This interest sparked my desire to obtain an MS in Statistics so I could amplify my understanding of what goes in to analytics in healthcare and medicine.
 
