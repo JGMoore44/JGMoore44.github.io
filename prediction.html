@@ -185,7 +185,10 @@ $(document).ready(function () {
   <a href="exploratoryAnalysis.html">Exploratory Analysis</a>
 </li>
 <li>
-  <a href="prediction.html">Prediction Models</a>
+  <a href="prediction.html">Prediction Model</a>
+</li>
+<li>
+  <a href="sourceCode.html">Source Code</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -238,7 +241,7 @@ data = dataWithSubject[,!(names(dataWithSubject)%in% c(&quot;subject.&quot;,&quo
 </div>
 <div id="run-model" class="section level3">
 <h3>Run Model</h3>
-<p>Now we will run our data through our ML Algorithm <code>optimumElastic()</code> which takes our data and the desired response variable in as arguments, uses cross validation to determine the optimal tunes of <span class="math inline">\(\lambda\)</span> as it correspond to its respecitve <span class="math inline">\(\alpha\)</span> value (over a sequence from <span class="math inline">\(\alpha = (0.5,0.95)\)</span>), and returns a list of error rates as they relate to each <span class="math inline">\(\alpha\)</span> value as well as the <span class="math inline">\(\alpha\)</span> value that yields the lowest error rate. The source code for function <code>optimumElastic()</code> can be found in Appendix 1 in the <strong>Source Code</strong> tab at the top of this web page.</p>
+<p>Now we will run our data through our ML Algorithm <code>optimumElastic()</code> which takes our data and the desired response variable in as arguments, uses cross validation to determine the optimal tunes of <span class="math inline">\(\lambda\)</span> as it correspond to its respecitve <span class="math inline">\(\alpha\)</span> value (over a sequence from <span class="math inline">\(\alpha = (0.5,0.95)\)</span>), and returns a list of error rates as they relate to each <span class="math inline">\(\alpha\)</span> value as well as the <span class="math inline">\(\alpha\)</span> value that yields the lowest error rate. The source code for function <code>optimumElastic()</code> can be found in the <strong>Source Code</strong> tab at the top of this web page.</p>
 <pre class="r"><code>library(glmnet)
 #Determine best Model
 set.seed(1234)
@@ -295,7 +298,7 @@ mean((rfPred - testSet$motor_UPDRS)^2)</code></pre>
 <pre><code>## [1] 11.81427</code></pre>
 <p>Notice thate our random forest model gives us a smaller MSE prediction rate. Now we will look at how each feature influences our error rate.</p>
 <pre class="r"><code>#Visualize Variable Importance
-varImpPlot(rf, main = &quot;Random Forest VIF Plot&quot;)</code></pre>
+varImpPlot(rf, main = &quot;Random Forest Variable Importance Plot&quot;)</code></pre>
 <p><img src="prediction_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
 </div>
 <div id="conclusion" class="section level3">
