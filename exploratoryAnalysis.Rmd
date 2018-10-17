@@ -19,6 +19,75 @@ In our prediction model we are focusing on the response `motor_UPDRS` for that r
 
 ```{r, echo=FALSE,warning=FALSE,message=FALSE}
 library(ggplot2)
-ggplot(data = dataExploratory, aes(x = motor_UPDRS, color = sex))+
-  geom_freqpoly()
+ggplot(data = dataExploratory, aes(x = motor_UPDRS,color = sex))+
+  geom_density()+
+  scale_color_discrete(name = "Sex",
+                      labels = c("Male","Female"))+
+  ggtitle("Density Curves for motor UPDRS score")+
+  xlab("Motor UPDRS Score")
+```
+
+The above plot figure shows the density curve for motor UPDRS score as it relates the gender. The red curve represents males and the blue curve represents females. At a glance we can see that Male's appear to have less variability in their motor scores than females. This is confirmed below when we calculate the variance of each group.
+
+```{r}
+#Variance of Motor Score for Men
+var(dataExploratory$motor_UPDRS[which(dataExploratory$sex==0)])
+#Variance of Motor Score for Women
+var(dataExploratory$motor_UPDRS[which(dataExploratory$sex==1)])
+```
+
+It can also be noted that, by group, the motor score is multimodal, meaning measures of centrality (mean, median, mode) must be considered with caution. Interestingly, the density plot for total UPDRS score does not yield the same result. If we look at the plot below, it appears that women have less variability in their total UPDRS scores.
+
+```{r, echo=FALSE,warning=FALSE,message=FALSE}
+library(ggplot2)
+ggplot(data = dataExploratory, aes(x = total_UPDRS,color = sex))+
+  geom_density()+
+  scale_color_discrete(name = "Sex",
+                      labels = c("Male","Female"))+
+  ggtitle("Density Curves for Total UPDRS score")+
+  xlab("Total UPDRS Score")
+```
+
+This observation is confirmed when we calculate the variance for each group
+```{r}
+#Variance of Total Score, Male
+var(dataExploratory$total_UPDRS[which(dataExploratory$sex==0)])
+#Variance of Total Score, Female
+var(dataExploratory$total_UPDRS[which(dataExploratory$sex==1)])
+```
+
+In conclusion, Men have less variability in motor UPDRS scores, whereas women have less variability in total UPDRS score. Whether or not these differences in variability are significant would require an F-Test on the ratio of variance for each group.
+
+##Box Plots
+Now we will use boxplots to get another perspective on the relationship between gender and motor/total UPDRS scores.
+
+```{r,echo=FALSE,warning=FALSE,message=FALSE}
+library(cowplot)
+totalBox = ggplot(data = dataExploratory, aes(x = sex, y = total_UPDRS))+
+  geom_boxplot()+
+  ggtitle("Total Score on Gender")+
+  ylab("Total Score")+
+  xlab("Gender")
+motorBox = ggplot(data = dataExploratory, aes(x = sex, y = motor_UPDRS))+
+  geom_boxplot()+
+  ggtitle("Motor Score on Gender")+
+  ylab("Motor Score")+
+  xlab("Gender")
+
+plot_grid(motorBox,totalBox)
+```
+
+The differing variability of total score between men and women is still clear from the differing IQR's shown in the boxplots. However, we are unable to capture the multimodality of the data which can be a potential shortcoming of boxplots. One added benefit of these plots is that we can get a feel for any outliers. It does not appear from these plots that our data has any outlying observations.
+
+###Correlations/Associations
+We will now look at the assocation between motor and total UPDRS score. This is visualized below in the scatter plot.
+
+```{r, echo = FALSE}
+ggplot(data = dataExploratory, aes(x = motor_UPDRS, y = total_UPDRS,color = sex))+
+  geom_point()+
+  scale_color_discrete(name = "Sex",
+                       label= c("Male", "Female"))+
+  ggtitle("Total Score on Motor Score")+
+  xlab("Motor Score")+
+  ylab("Total Score")
 ```
