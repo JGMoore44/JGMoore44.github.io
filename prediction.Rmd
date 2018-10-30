@@ -89,6 +89,8 @@ To begin our analysis we will set up our data to exclude the features we are not
 #Predict Motor UPDRS Score
 #Exclude Subject ID, Total Score, and time in trial, from model
 data = dataWithSubject[,!(names(dataWithSubject)%in% c("subject.","total_UPDRS","test_time"))]
+predSet = setTrainTest(data,"test",1)
+data = setTrainTest(data,"train",1)
 ```
 
 ### Run Model
@@ -106,7 +108,7 @@ pInfoList = optimumElastic(data,"motor_UPDRS")
 plot(pInfoList$alphaVect, pInfoList$errorRate,col=ifelse(pInfoList$alphaVect==pInfoList$alphaVect[pInfoList$bestAlphaIndex], "red", "black"),main = "Error Rate on Alpha",xlab = "Alpha Value",ylab = "Error Rate")
 ```
 
-We can see that the lowest error rate is indicated by the red point in the above plot and corresponds to the best elastic net model for our data. In this case $\alpha = 0.6$
+We can see that the lowest error rate is indicated by the red point in the above plot and corresponds to the best elastic net model for our data. In this case $\alpha = 0.75$
 
 Next, we will visualize how the optimal $\lambda$ was chosen for this model.
 ```{r, echo = FALSE}
@@ -138,14 +140,15 @@ Similarly, the above plot shows our error rate as a function of $\ln(\lambda)$. 
 Now we are going to use our model to predict `motor_UPDRS`. We will also look at some diagnostic plots to make sure that the residuals in our model uphold the assumptions of independence, normality and homoscedasticity.
 ```{r}
 ##Make Prediction
-yHat =predict(cvElastic,testMat,s = "lambda.min")
+predMat = model.matrix(motor_UPDRS ~ ., data = predSet)
+yHat =predict(cvElastic,predMat,s = "lambda.min")
 ```
 
 ```{r, echo=FALSE,message=FALSE,warning=FALSE}
 ##Residual Analysis
 diagFrame = data.frame(predVal = c(yHat),
-                       realVal = c(testSet$motor_UPDRS),
-                       resi = c((testSet$motor_UPDRS-yHat)))
+                       realVal = c(predSet$motor_UPDRS),
+                       resi = c((predSet$motor_UPDRS-yHat)))
 library(ggplot2)
 ggplot(data = diagFrame, aes(x=predVal,y=resi))+
   geom_point()+
@@ -169,11 +172,11 @@ ggplot(data = diagFrame, aes(sample = resi))+
 We can see in the above Q-Q plot that there may be slight deviations from normality, however, the assumption of normality is relatively flexible, especially in the context of prediction and therefore we can conclude that our model is valid for predictions.
 
 ###Final Model
-We will now look at the coefficient values generated for our final model. Notice that we were able to obtain an MSE of about 57.2 while using fewer predictors than that of a full model. This is one of the benefits of shrinkage models. The chosen features and their corresponding coefficient estimates are seen in the table below
+We will now look at the coefficient values generated for our final model. Notice that we were able to obtain an MSE of about 56.9 while using fewer predictors than that of a full model. This is one of the benefits of shrinkage models. The chosen features and their corresponding coefficient estimates are seen in the table below
 ```{r, echo=FALSE}
 set.seed(1234)
-mean((yHat-testSet$motor_UPDRS)^2)
-predict(cvElastic,testMat,type = "coefficients")
+mean((yHat-predSet$motor_UPDRS)^2)
+predict(cvElastic,predMatt,type = "coefficients")
 ```
 
 ###Comparision to a Random Forest
@@ -182,13 +185,13 @@ Arguably, Random Forests are the gold standard for quick and dirt prediction mod
 ```{r, echo = FALSE,message=FALSE,warning=FALSE}
 library(randomForest)
 set.seed(1234)
-rf = randomForest(motor_UPDRS~.,data = trainingSet, ntree = 100, importance=TRUE)
-rfPred = predict(rf,testSet)
+rf = randomForest(motor_UPDRS~.,data = data, ntree = 100, importance=TRUE)
+rfPred = predict(rf,predSet)
 ```
 
 ```{r}
 #Calculate MSE of our Random Forest Model
-mean((rfPred - testSet$motor_UPDRS)^2)
+mean((rfPred - predSet$motor_UPDRS)^2)
 ```
 Notice thate our random forest model gives us a smaller MSE prediction rate. Now we will look at how each feature influences our error rate.
 
@@ -199,7 +202,7 @@ varImpPlot(rf, main = "Random Forest Variable Importance Plot")
 
 
 ###Conclusion
-We can see that the MSE of prediction is much smaller when we use a random forest model, however, computation time is also larger, and the model uses all of the predictors. In this case we would need to consult our client to determine whether or not the sole focus of the model is in prediction (in which case we could continue to tune our random forest model), or if they are also interested in simplicy and ease of interpretation (in which case we we would use our elastic net model).
+We can see that the MSE of prediction is much smaller when we use a random forest model, however, computation time is also larger, and the model uses all of the predictors. In this case we would need to consult our client to determine whether or not the sole focus of the model is in prediction (in which case we could continue to tune our random forest model), or if they are also interested in simplicity and ease of interpretation (in which case we we would use our elastic net model).
 
 
 
