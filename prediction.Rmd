@@ -121,7 +121,7 @@ testMat = model.matrix(motor_UPDRS ~ ., data = testSet)
 
 ##Create Model
 cvElastic = cv.glmnet(trainingMat,trainingSet$motor_UPDRS,alpha=pInfoList$alphaVect[pInfoList$bestAlphaIndex])
-plot(cvElastic$lambda,cvElastic$cvm, type = "l", main = "Elastic Net Alpha = 0.6",xlab = "Cross Validated Lambda", ylab = "Mean Cross Validated Error")
+plot(cvElastic$lambda,cvElastic$cvm, type = "l", main = "Elastic Net Alpha = 0.75",xlab = "Cross Validated Lambda", ylab = "Mean Cross Validated Error")
 abline(v = cvElastic$lambda.min,col = "blue",lwd=1)
 abline(h = min(cvElastic$cvm),col = "blue", lwd=1)
 abline(v = cvElastic$lambda.1se,col = "blue",lwd=1, lty=2)
